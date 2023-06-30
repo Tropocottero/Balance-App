@@ -13,9 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Balance',
-
       theme: ThemeData(primarySwatch: Colors.amber),
-
       home: const MyHomePage(title: 'Balance'),
     );
   }
@@ -29,34 +27,25 @@ class MyHomePage extends StatefulWidget {
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
 
       appBar: AppBar(
         title: Text(widget.title),
       ),
 
 
-      // Da fare Drawer
+      // TODO Drawer con la navigazione verso le varie pagine
 
 
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Inserire la generazione delle card Trasanzioni
+            // TODO Inserire la generazione delle card Trasanzioni
             Container()
           ]
         ),
@@ -73,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         },
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }

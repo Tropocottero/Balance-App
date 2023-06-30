@@ -27,7 +27,7 @@ class PopupMenuHome extends StatefulWidget {
 }
 class _PopupMenuHomeState extends State<PopupMenuHome> {
 
-  final opzioniNotifier _notifierPadre = opzioniNotifier();
+  final ValueNotifier<String> nofifierPadrino = ValueNotifier('');
   TextEditingController _valoreTran = TextEditingController();
 
   @override
@@ -40,47 +40,54 @@ class _PopupMenuHomeState extends State<PopupMenuHome> {
 
       // Contenuto del Popup
       content: Padding(padding: EdgeInsets.all(5),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-
-
-          // 2 Widget superiori con menu a selezione
-          Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Widget per la Tipologia di Transazione
-              DropDownTipologia(listaOggetti: ['ent','usc'], notifierFiglio: _notifierPadre),
 
-              // Widget per la causale della transazione
-              DropdownMenuCausale(
-                  oggetti: limitaSelezione(_notifierPadre.opzioneSelezionata!),
-                  notifierFiglio: _notifierPadre,
+
+              // 2 Widget superiori con menu a selezione
+              Row(
+                children: [
+                  // Widget per la Tipologia di Transazione
+                  DropDownTipologia(
+                      listaOggetti: ['ent','usc'],
+                      notifierFiglio: nofifierPadrino,
+                  ),
+
+                  Padding(padding: EdgeInsets.all(20)),
+
+
+                  // Widget per la causale della transazione
+                  DropdownMenuCausale(
+                    oggetti: limitaSelezione(nofifierPadrino.value),
+                    notifierFiglio: nofifierPadrino,
+                  ),
+                ],
               ),
+
+
+              // Widget inferiore che permette di inserire la cifra
+              Container(
+                //color: Colors.purple,
+                child: TextField(
+                  keyboardType: TextInputType.number,
+                  maxLength: 10,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'valore della Transazione'
+                  ),
+                  controller: _valoreTran,
+                ),
+              )
             ],
-          ),
-
-
-          // Widget inferiore che permette di inserire la cifra
-          Container(
-            //color: Colors.purple,
-            child: TextField(
-              keyboardType: TextInputType.number,
-              maxLength: 10,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'valore della Transazione'
-              ),
-              controller: _valoreTran,
-            ),
-          )
-        ],
-      )),
+          )),
 
       // Pulsante di Conferma Finale
       actions: [
         TextButton(
             onPressed: () {
-              print(_valoreTran.text);  // printa il valore della Transazione
+              print(_valoreTran.text);  // printa il valore della Transazione come check
+              // TODO funzione che salva il valore della transazione e le scelte dei menu dropdown
               Navigator.pop(context);  // chiude il Popup
             },
             child: Text('Conferma'))
@@ -93,7 +100,7 @@ class _PopupMenuHomeState extends State<PopupMenuHome> {
 class DropDownTipologia extends StatefulWidget {
   const DropDownTipologia({super.key, required this.listaOggetti, required this.notifierFiglio});
 
-  final opzioniNotifier notifierFiglio;
+  final ValueNotifier<String> notifierFiglio;
   final List<String> listaOggetti;
 
   @override
@@ -127,8 +134,8 @@ class _DropDownTipologiaState extends State<DropDownTipologia> {
 
       onChanged: (String? value) {
         setState(() => _valoreSelezionato = value);
-        widget.notifierFiglio.confermaSelezione(value);
-        },
+        widget.notifierFiglio.value = value!;
+      },
       // Aggiorna il widget cambiando la scelta selezionata se necesario
 
     );
@@ -139,7 +146,7 @@ class _DropDownTipologiaState extends State<DropDownTipologia> {
 class DropdownMenuCausale extends StatefulWidget {
   const DropdownMenuCausale({super.key, required this.oggetti, required this.notifierFiglio});
 
-  final opzioniNotifier notifierFiglio;
+  final ValueNotifier<String> notifierFiglio;
   final List<String> oggetti;
 
   @override
@@ -157,25 +164,26 @@ class _DropdownMenuCausaleState extends State<DropdownMenuCausale> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.notifierFiglio,
-      builder: (BuildContext context, Widget? child) {
+    return ValueListenableBuilder(
+      valueListenable: widget.notifierFiglio,
+      builder: (context, value, child) {
 
-        print(widget.notifierFiglio.opzioneSelezionata); // PORCODDIO
+      print(value); // PORCODDIO
 
-        return DropdownButton<String>(
-          value: _valoreSelezionato,
-          // Inserisce il valore di default nel menu
-          icon: const Icon(Icons.arrow_drop_down),
-          // Icona a sinistra del menu
+      return DropdownButton<String>(
+        value: _valoreSelezionato,
+        // Inserisce il valore di default nel menu
+        icon: const Icon(Icons.arrow_drop_down),
+        // Icona a sinistra del menu
 
-          items: widget.oggetti.map(CostruisciOpzioni).toList(),
-          // Prende ogni valore di _modalita e costruisce un opzione, .toList le inserisce in una lista
+        items: widget.oggetti.map(CostruisciOpzioni).toList(),
+        // Prende ogni valore di _modalita e costruisce un opzione, .toList le inserisce in una lista
 
-          onChanged: (String? value) {
-            setState(() => _valoreSelezionato = value);
-          },
-        );
+        onChanged: (String? value) {
+          setState(() => _valoreSelezionato = value);
+        },
+      );
+
       },
     );
   }
